@@ -33,6 +33,7 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         const roomCollection = client.db('HotelManagement').collection('Rooms')
+        const bookRoomCollection = client.db('HotelManagement').collection('Booking')
 
         app.get('/rooms', async (req, res) => {
             const result = await roomCollection.find().sort({price_per_night:1}).toArray()    
@@ -45,7 +46,12 @@ async function run() {
             const result = await roomCollection.findOne(query)
             res.send(result);
         })
-
+        // save booking rooms in database
+          app.post('/booking',async (req,res) =>{
+            const bookingData = req.body
+            const result = await bookRoomCollection.insertOne(bookingData)
+            res.send(result)
+          })
     
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
