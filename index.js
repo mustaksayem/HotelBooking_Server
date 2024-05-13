@@ -9,6 +9,7 @@ const corsOptions = {
     origin: [
         'http://localhost:5173',
         'http://localhost:5174',
+        'https://assignment-11-b42b6.web.app',
 
     ],
     credentials: true,
@@ -111,6 +112,26 @@ async function run() {
         })
 
 
+        app.put("/roomsAvailable/:id", async (req, res) => {
+         
+            const query = { _id: new ObjectId(req.params.roomId) }
+            const data = {
+                $set: {
+                    availability: req.body.availability,
+                 
+                }
+            }
+            console.log(data);
+            const result = await roomCollection.updateOne(query, data)
+            res.send(result)
+        })
+
+
+
+
+
+
+
         // update date
 
         app.put("/update/:id", async (req, res) => {
@@ -138,12 +159,46 @@ async function run() {
             res.send(result);
         })
 
+        // app.delete('/mybooking/:id', async (req, res) => {
+        //     const id = req.params.id
+        //     const query = { _id: new ObjectId(id) }
+        //     const result = await bookRoomCollection.deleteOne(query)
+        //     res.send(result)
+        // })
+
+
+
+
+
+
         app.delete('/mybooking/:id', async (req, res) => {
-            const id = req.params.id
-            const query = { _id: new ObjectId(id) }
-            const result = await bookRoomCollection.deleteOne(query)
-            res.send(result)
-        })
+            try {
+                const id = req.params.id;
+                const query = { _id: new ObjectId(id) };
+        
+                // Fetch booking details to get roomId
+                const booking = await bookRoomCollection.findOne(query);
+                if (!booking) {
+                    res.status(404).send("Booking not found");
+                    return;
+                }
+        
+                // Delete the booking
+                const result = await bookRoomCollection.deleteOne(query);
+        
+                // Update availability of the room in roomCollection to "Available"
+                const roomId = booking.roomId;
+                const updateQuery = { _id: new ObjectId(roomId) };
+                const updateData = { $set: { availability: "Available" } };
+                await roomCollection.updateOne(updateQuery, updateData);
+        
+                res.send(result);
+            } catch (error) {
+                console.error("Error deleting booking:", error);
+                res.status(500).send("Internal server error");
+            }
+        });
+        
     
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
