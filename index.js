@@ -37,6 +37,31 @@ async function run() {
         const bookRoomCollection = client.db('HotelManagement').collection('Booking')
         const reviewCollection = client.db('HotelManagement').collection('Review')
 
+        // jwt
+
+        app.post("/jwt", async (req, res) => {
+            const user = req.body
+            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '365d' })
+            res.cookie("token", token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: process.env.NODE_ENV === "production" ? "none" : "strict"
+            }).send({ success: true })
+        })
+
+
+        app.get('/logout', (req, res) => {
+            res.clearCookie("token", {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: process.env.NODE_ENV === "production" ? "none" : "strict", maxAge: 0,
+            }).send({ success: true })
+
+        })
+
+
+
+
         app.get('/rooms', async (req, res) => {
             const result = await roomCollection.find().sort({price_per_night:1}).toArray()    
             res.send(result)
@@ -72,6 +97,14 @@ async function run() {
             const id = req.params.id
             const query = {_id: new ObjectId(id)}
             const result = await bookRoomCollection.findOne(query)
+            res.send(result);
+        })
+
+
+        app.get('/reviewByid/:id', async (req, res) => {
+            const id = req.params.id
+            const query = {_id: new ObjectId(id)}
+            const result = await reviewCollection.findOne(query)
             res.send(result);
         })
 
