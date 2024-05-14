@@ -1,5 +1,7 @@
 const express = require('express')
 const cors = require('cors')
+const jwt = require("jsonwebtoken")
+const cookieParser = require('cookie-parser');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 require('dotenv').config()
 const port = process.env.PORT || 9000
@@ -16,9 +18,25 @@ const corsOptions = {
     optionSuccessStatus: 200,
 }
 app.use(cors(corsOptions))
+
 app.use(express.json())
+app.use(cookieParser()) 
 
 
+const verifyToken = (req, res, next) => {
+    const token = req.cookies?.token
+    if (!token) return res.status(401).send({ message: 'Unauthorized access' })
+    if (token) {
+        jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+            if (err) {
+                console.log(err)
+                return res.status(401).send({ message: 'Unauthorized access' })
+            }
+            req.user = decoded
+            next()
+        })
+    }
+}
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.wdpofk5.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
@@ -185,8 +203,13 @@ async function run() {
 
 
 
-          app.get('/mybookings/:email', async (req, res) => {
+          app.get('/mybookings/:email',verifyToken, async (req, res) => {
+            const tokenEmail = req.user?.email
             const email = req.params.email
+            if (tokenEmail !== email) {
+                return res.status(403).send({ message: 'Forbidden Access' })
+            }
+            
             const query = { email: email }
             const result = await bookRoomCollection.find(query).toArray()
             res.send(result);
