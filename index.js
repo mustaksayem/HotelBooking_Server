@@ -139,7 +139,7 @@ async function run() {
             res.send(result)
           })
 
-        //   save review in database
+      
         app.post('/review',async (req,res) =>{
             const reviewData = req.body
        
@@ -148,7 +148,7 @@ async function run() {
             
           })
           
-           //update avalability
+          
            app.put("/rooms/:id", async (req, res) => {
             const query = { _id: new ObjectId(req.params.id) }
             const data = {
@@ -183,10 +183,10 @@ async function run() {
 
 
 
-        // update date
+        
 
         app.put("/update/:id", async (req, res) => {
-            // Add console log here
+            
             console.log("Received PUT request for id:", req.params.id);
           
             const query = { _id: new ObjectId(req.params.id) };
