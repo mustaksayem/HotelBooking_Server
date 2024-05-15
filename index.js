@@ -215,17 +215,6 @@ async function run() {
             res.send(result);
         })
 
-        // app.delete('/mybooking/:id', async (req, res) => {
-        //     const id = req.params.id
-        //     const query = { _id: new ObjectId(id) }
-        //     const result = await bookRoomCollection.deleteOne(query)
-        //     res.send(result)
-        // })
-
-
-
-
-
 
         app.delete('/mybooking/:id', async (req, res) => {
             try {
@@ -239,10 +228,10 @@ async function run() {
                     return;
                 }
         
-                // Delete the booking
+               
                 const result = await bookRoomCollection.deleteOne(query);
         
-                // Update availability of the room in roomCollection to "Available"
+               
                 const roomId = booking.roomId;
                 const updateQuery = { _id: new ObjectId(roomId) };
                 const updateData = { $set: { availability: "Available" } };
