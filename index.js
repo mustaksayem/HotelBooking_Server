@@ -55,7 +55,7 @@ async function run() {
         const bookRoomCollection = client.db('HotelManagement').collection('Booking')
         const reviewCollection = client.db('HotelManagement').collection('Review')
 
-        // jwt
+        
 
         app.post("/jwt", async (req, res) => {
             const user = req.body
@@ -100,7 +100,7 @@ async function run() {
             res.send(result);
         })
 
-        // dfghjk
+       
 
         app.get('/rooms/:id', async (req, res) => {
             const id = req.params.id
@@ -110,7 +110,7 @@ async function run() {
         })
 
 
-// booking single id get
+
         app.get('/booking/:id', async (req, res) => {
             const id = req.params.id
             const query = {_id: new ObjectId(id)}
@@ -132,7 +132,7 @@ async function run() {
 
 
 
-        // save booking rooms in database
+        
           app.post('/booking',async (req,res) =>{
             const bookingData = req.body
             const result = await bookRoomCollection.insertOne(bookingData)
